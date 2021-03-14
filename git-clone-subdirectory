@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+if [ $# -lt 2 ]; then
+  # >&2 echo "Usage: $0 <repository>  <directory> [path_to_subdirectory]"
+  >&2 echo "Usage: $0 <repository> [path_to_subdirectory]"
+  exit 1
+fi
+
+REPOSITORY=$1 # the repository to clone
+# DIRECTORY=$2 # the directory to clone into
+SUB_DIRECTORIES=${@:2} # an array of directories
+
+# needs a condition here in case it failed cloning
+git clone --no-checkout $REPOSITORY && cd $(basename $_ $GIT_DIR)
+git sparse-checkout init
+
+# git sparse-checkout disable
+
+for SUBDIR in $SUB_DIRECTORIES
+do
+  if ! git ls-tree -r -d --name-only HEAD | grep -x -q $SUBDIR; then
+    echo could not find '"'$SUBDIR'"' in the tree , quiting
+    rm *
+    # git sparse-checkout disable
+    exit 1
+  fi
+done
+
+# git ls-tree -r -d --name-only HEAD 
+git sparse-checkout set $SUB_DIRECTORIES
+# git sparse-checkout list
+
+echo "All done";
+
+exit 0
