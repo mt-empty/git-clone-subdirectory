@@ -3,6 +3,7 @@
 This is a simple tool to clone only subdirectories, it utilizes git [sparse-checkout](https://www.git-scm.com/docs/git-sparse-checkout
 ) feature
 
+May not work properly on Gitlab because `sparse-checkout` is EXPERIMENTAL.
 ## Git version requirement
 
 ```

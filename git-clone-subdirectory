@@ -6,31 +6,31 @@ if [ $# -lt 2 ]; then
   exit 1
 fi
 
-CURRENT_DIR=$PWD
-
 REPOSITORY=$1 # the repository to clone
 # DIRECTORY=$2 # the directory to clone into
 SUB_DIRECTORIES=( "${@:2}") # an array of directories
 
 
-if git clone --no-checkout "$REPOSITORY" ; then 
-
-  DIRECTORY=$(basename "$_" "$GIT_DIR")
+if git clone --filter=blob:none --no-checkout "$REPOSITORY" ; then 
+  DIRECTORY=$(basename "$REPOSITORY" ".git")
   cd "$DIRECTORY" || exit 1
   git sparse-checkout init
+  
+  declare -a VALID_SUB_DIRECTORIES
 
   for SUBDIR in "${SUB_DIRECTORIES[@]}"
   do
     SP_FREE_SUBDIR=$(printf '%s' "$SUBDIR" | sed "s|^/||" | sed "s|/$||")
     if ! git ls-tree -r -d --name-only HEAD | grep -x -q "$SP_FREE_SUBDIR"; then
-      echo could not find '"'"$SP_FREE_SUBDIR"'"' in the tree , quiting
-      rm -rf "$CURRENT_DIR"/"$DIRECTORY"
-      exit 1
+      echo Error: Could not find '"'"$SP_FREE_SUBDIR"'"' in the tree object
+    else  #append if valid entry
+      VALID_SUB_DIRECTORIES+=("$SUBDIR")
     fi
   done
 
-  git sparse-checkout set "${SUB_DIRECTORIES[@]}"
-
+  if [ ${#VALID_SUB_DIRECTORIES[@]} -ne 0 ]; then
+    git sparse-checkout set "${VALID_SUB_DIRECTORIES[@]}"
+  fi
   echo "All done";
 
 fi
