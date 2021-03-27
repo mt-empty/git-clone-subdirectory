@@ -13,7 +13,7 @@ May not work properly on Gitlab because `sparse-checkout` is EXPERIMENTAL.
 ## Install
 
 ```bash
-git clone https://github.com/ && cd git-clone-subdirectory 
+git clone https://github.com/mt-empty/git-clone-subdirectory.git && cd git-clone-subdirectory 
 make install
 ```
 
